@@ -17,6 +17,7 @@ import (
   "os"
   "io"
   "time"
+  //"unicode/utf8"
 )
 
 var global_aes_key string = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
@@ -61,6 +62,25 @@ func StringToInt32(x string) int32 {
   return rtn_val
 }
 
+func URLToUTF8(x string) string {
+  cur_vl := ""
+  var int_vl int32
+  var rtn_rune []rune
+  for i:= 0; i < len(x); i++ {
+    if x[i] != '-' {
+      cur_vl += string(x[i])
+    } else {
+      int_vl = StringToInt32(cur_vl)
+      rtn_rune = append(rtn_rune, rune(int_vl))
+      cur_vl = ""
+    }
+  }
+  int_vl = StringToInt32(cur_vl)
+  rtn_rune = append(rtn_rune, rune(int_vl))
+  fmt.Println("end", rtn_rune)
+  return string(rtn_rune)
+}
+
 func cipherer(x *string, secret_key *string) string {
 
   cur_aes, err := aes.NewCipher([]byte(*secret_key))
@@ -82,6 +102,8 @@ func cipherer(x *string, secret_key *string) string {
 
   cipher_data := cur_gcm.Seal(cur_nonce, cur_nonce, []byte(*x), nil)
 
+  //fmt.Println("OO", cipher_data)
+
   return string(cipher_data)
 }
 
@@ -101,6 +123,53 @@ func decipherer(x *string, secret_key *string) string {
   cipher_data := (*x)[nonce_size:]
   
   deciphered_data, err := cur_gcm.Open(nil, []byte(cur_nonce), []byte(cipher_data), nil)
+  if err != nil {
+    fmt.Println(err)
+    return ""
+  }
+  return string(deciphered_data)
+}
+
+func ByteCipherer(x *string, secret_key *string) []byte {
+
+  cur_aes, err := aes.NewCipher([]byte(*secret_key))
+  if err != nil {
+    fmt.Println(err)
+    return []byte{}
+  }
+  cur_gcm, err := cipher.NewGCM(cur_aes)
+  if err != nil {
+    fmt.Println(err)
+    return []byte{}
+  }
+  cur_nonce := make([]byte, cur_gcm.NonceSize())
+  _, err = rand.Read(cur_nonce)
+  if err != nil {
+    fmt.Println(err)
+    return []byte{}
+  }
+
+  cipher_data := cur_gcm.Seal(cur_nonce, cur_nonce, []byte(*x), nil)
+
+  return cipher_data
+}
+
+func ByteDecipherer(x *[]byte, secret_key *string) string {
+  cur_aes, err := aes.NewCipher([]byte(*secret_key))
+  if err != nil {
+    fmt.Println(err)
+    return ""
+  }
+  cur_gcm, err := cipher.NewGCM(cur_aes)
+  if err != nil {
+    fmt.Println(err)
+    return ""
+  }
+  nonce_size := cur_gcm.NonceSize()
+  cur_nonce := (*x)[:nonce_size]
+  cipher_data := (*x)[nonce_size:]
+  
+  deciphered_data, err := cur_gcm.Open(nil, []byte(cur_nonce), cipher_data, nil)
   if err != nil {
     fmt.Println(err)
     return ""
@@ -392,8 +461,21 @@ func main() {
     return
   }
 
-  id_val_ciphered := cipherer(&id_val, &global_aes_key)
-  id_val_ciphered = UTF8ToURL(id_val_ciphered)
+  id_val_ciphered1 := ByteCipherer(&id_val, &global_aes_key)
+  fmt.Println("0", id_val_ciphered1, len(id_val_ciphered1))
+
+  id_val_ciphered := ""
+  var tmp_int32 int32
+  for i := 0; i < len(id_val_ciphered1); i++ {
+    tmp_int32 = int32(id_val_ciphered1[i])
+    id_val_ciphered += Int32ToString(&tmp_int32)
+    id_val_ciphered += "-"
+  }
+  id_val_ciphered = id_val_ciphered[:len(id_val_ciphered) - 1]
+
+  //rec2 := ByteDecipherer(&id_val_ciphered1, &global_aes_key)
+  //fmt.Println("deciphered:", rec2)
+
   my_addr := ip_val + ":" + port_val + "/" + room_val + "_" + id_val_ciphered
   my_addr2 := ip_val + ":" + port_val + "/"
 
