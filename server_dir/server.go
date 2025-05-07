@@ -30,7 +30,7 @@ func GenerateAES256() string {
   for i := 0; i < 32; i++ {
     if tm % 3 == 0 {
       rtn_str += string(ref_ltr[tm % 52])
-      tm *= 1.5
+      tm *= 2
     } else if tm % 2 == 0 {
       rtn_str += string(ref_nb[tm % 10])
       tm /= 2
