@@ -6,6 +6,8 @@ import (
   "github.com/gorilla/websocket"
   "sync"
   "database/sql"
+  "crypto/aes"
+  "crypto/cipher"
   "encoding/pem"
   "crypto/x509"
   "crypto/rand"
@@ -14,6 +16,7 @@ import (
   _"github.com/go-sql-driver/mysql"
 )
 
+var global_aes_key string = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 var mu sync.RWMutex
 var upgrader = websocket.Upgrader{ReadBufferSize: 1024,
                                   WriteBufferSize: 1024,
@@ -25,6 +28,29 @@ var ref_ltr = [52]uint8{'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', '
 var ref_nb = [10]uint8{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'}
 var ref_spechr = [24]uint8{'!', '.', ':', ';', '\\', '-', '%', '*', ',', '_', '/', '<', '>', '=', '[', ']', '\'', '{', '}', '[', ']', '(', ')', '"'}
 var banned_char = [2]uint8{'/', ' '}
+
+func decipherer(x *string, secret_key *string) string {
+  cur_aes, err := aes.NewCipher([]byte(*secret_key))
+  if err != nil {
+    fmt.Println(err)
+    return ""
+  }
+  cur_gcm, err := cipher.NewGCM(cur_aes)
+  if err != nil {
+    fmt.Println(err)
+    return ""
+  }
+  nonce_size := cur_gcm.NonceSize()
+  cur_nonce := (*x)[:nonce_size]
+  cipher_data := (*x)[nonce_size:]
+  
+  deciphered_data, err := cur_gcm.Open(nil, []byte(cur_nonce), []byte(cipher_data), nil)
+  if err != nil {
+    fmt.Println(err)
+    return ""
+  }
+  return string(deciphered_data)
+}
 
 func GoodId(given_password string) bool {
   var n int = len(given_password)
@@ -115,7 +141,6 @@ func HandShakeHandler(db *sql.DB) http.HandlerFunc {
       return
     }
     chat_room := ""
-    id := ""
     i := 1
     for i < n && my_url[i] != '_' {
       chat_room += string(my_url[i])
@@ -134,11 +159,13 @@ func HandShakeHandler(db *sql.DB) http.HandlerFunc {
       w.Write([]byte("This room does not exist"))
       return
     }
+    pre_id := ""
     i++
     for i < n {
-      id += string(my_url[i])
+      pre_id += string(my_url[i])
       i++
     }
+    id := decipherer(&pre_id, &global_aes_key)
     is_valid = GoodId(id)
     if !is_valid {
       w.Write([]byte("Wrong Id"))
