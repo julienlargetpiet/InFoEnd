@@ -2,7 +2,7 @@
 
 ![Alt Text](demo.gif)
 
-A terminal end-to-end encrypted terminal chatroom application written in Go. 
+An end-to-end encrypted terminal chatroom application written in Go. 
 
 ## Explanation
 
