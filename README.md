@@ -1,6 +1,6 @@
 # InFoEnd
 
-![](demo.mp4)
+[![Watch the video](demo.mp4)]
 
 A terminal end-to-end encrypted terminal chatroom application written in Go. 
 
