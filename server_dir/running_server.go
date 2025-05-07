@@ -226,6 +226,11 @@ func HandShakeHandler(db *sql.DB) http.HandlerFunc {
             w.Write([]byte("Something went wrong"))
             return
           }
+          _, err = db.Exec("UPDATE Status SET aes_key=' ' WHERE name=?;", chat_room)
+          if err != nil {
+            w.Write([]byte("Something went wrong"))
+            return
+          }
         }
         w.Write(ciphered_aes)
         return
