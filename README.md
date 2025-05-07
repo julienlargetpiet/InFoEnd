@@ -4,6 +4,12 @@
 
 A terminal end-to-end encrypted terminal chatroom application written in Go. 
 
+## Explanation
+
+![Alt Text](doc1.jpg)
+![Alt Text](doc2.jpg)
+
+
 ## Setting up the server
 
 With Mariadb
