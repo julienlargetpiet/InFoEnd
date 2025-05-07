@@ -29,6 +29,72 @@ var ref_nb = [10]uint8{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'}
 var ref_spechr = [24]uint8{'!', '.', ':', ';', '\\', '-', '%', '*', ',', '_', '/', '<', '>', '=', '[', ']', '\'', '{', '}', '[', ']', '(', ')', '"'}
 var banned_char = [2]uint8{'/', ' '}
 
+func ByteDecipherer(x *[]byte, secret_key *string) string {
+  cur_aes, err := aes.NewCipher([]byte(*secret_key))
+  if err != nil {
+    fmt.Println(err)
+    return ""
+  }
+  cur_gcm, err := cipher.NewGCM(cur_aes)
+  if err != nil {
+    fmt.Println(err)
+    return ""
+  }
+  nonce_size := cur_gcm.NonceSize()
+  cur_nonce := (*x)[:nonce_size]
+  cipher_data := (*x)[nonce_size:]
+  
+  deciphered_data, err := cur_gcm.Open(nil, []byte(cur_nonce), cipher_data, nil)
+  if err != nil {
+    fmt.Println(err)
+    return ""
+  }
+  return string(deciphered_data)
+}
+
+func StringToInt32(x string) int32 {
+  var ref_nb = [10]uint8{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'}
+  var rtn_val int32 = 0
+  var lngth int = len(x)
+  var i2 int32
+  var cur_rn uint8
+  var i int
+  for i = 0; i + 1 < lngth; i++ {
+    cur_rn = x[i]
+    i2 = 0
+    for cur_rn != ref_nb[i2]{
+      i2++
+    }
+    rtn_val += i2
+    rtn_val *= 10
+  }
+  cur_rn = x[i]
+  i2 = 0
+  for cur_rn != ref_nb[i2]{
+    i2++
+  }
+  rtn_val += i2
+  return rtn_val
+}
+
+func URLToByte(x string) []byte {
+  cur_vl := ""
+  var int_vl int32
+  var rtn_vl []byte
+  for i:= 0; i < len(x); i++ {
+    if x[i] != '-' {
+      cur_vl += string(x[i])
+    } else {
+      int_vl = StringToInt32(cur_vl)
+      rtn_vl = append(rtn_vl, byte(int_vl))
+      cur_vl = ""
+    }
+  }
+  int_vl = StringToInt32(cur_vl)
+  rtn_vl = append(rtn_vl, byte(int_vl))
+  return rtn_vl
+}
+
 func decipherer(x *string, secret_key *string) string {
   cur_aes, err := aes.NewCipher([]byte(*secret_key))
   if err != nil {
@@ -165,7 +231,11 @@ func HandShakeHandler(db *sql.DB) http.HandlerFunc {
       pre_id += string(my_url[i])
       i++
     }
-    id := decipherer(&pre_id, &global_aes_key)
+    pre_id2 := URLToByte(pre_id)
+    fmt.Println("pre_id:", pre_id)
+    fmt.Println("pre_id2:", pre_id2)
+    id := ByteDecipherer(&pre_id2, &global_aes_key)
+    fmt.Println("id:", id)
     is_valid = GoodId(id)
     if !is_valid {
       w.Write([]byte("Wrong Id"))
@@ -309,7 +379,8 @@ func (clients *Clients) WSHandler(db *sql.DB) http.HandlerFunc {
       pre_id += string(my_url[i])
       i++
     }
-    id := decipherer(&pre_id, &global_aes_key)
+    pre_id2 := URLToByte(pre_id)
+    id := ByteDecipherer(&pre_id2, &global_aes_key)
     is_valid = GoodId(id)
     if !is_valid {
       _, err := reject_upgrader.Upgrade(w, r, nil)
