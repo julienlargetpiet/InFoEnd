@@ -294,6 +294,34 @@ func Quitting(conn *websocket.Conn, cur_aes_key *string) {
   defer conn.Close()
 }
 
+func Int32ToString(x *int32) string {
+  if *x == 0 {
+    return "0"
+  }
+  const base int32 = 10
+  var remainder int32
+  rtn_str := ""
+  for *x > 0 {
+    remainder = *x % base
+    rtn_str = string(remainder + 48) + rtn_str
+    *x -= remainder
+    *x /= 10
+  }
+  return rtn_str
+}
+
+func UTF8ToURL(x string) string {
+  rtn_str := ""
+  var vl int32
+  for i := 0; i < len(x); i++ {
+    vl = int32(x[i])
+    rtn_str += Int32ToString(&vl)
+    rtn_str += "-"
+  }
+  rtn_str = rtn_str[:len(rtn_str) - 1]
+  return rtn_str
+}
+
 func main() {
 
   args := os.Args
@@ -365,6 +393,7 @@ func main() {
   }
 
   id_val_ciphered := cipherer(&id_val, &global_aes_key)
+  id_val_ciphered = UTF8ToURL(id_val_ciphered)
   my_addr := ip_val + ":" + port_val + "/" + room_val + "_" + id_val_ciphered
   my_addr2 := ip_val + ":" + port_val + "/"
 
