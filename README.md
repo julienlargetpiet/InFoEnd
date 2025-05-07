@@ -48,4 +48,8 @@ client_dir $ ./client id@IP:port/chat_room
 
 The client side terminal ui will appear if the informations provided are correct.
 
+## Deploying
+
+Deploy behind a reverse proxy with TLS enabled and run on `127.0.0.1`
+
 
