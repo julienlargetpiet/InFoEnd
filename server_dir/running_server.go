@@ -280,7 +280,7 @@ func (clients *Clients) WSHandler(db *sql.DB) http.HandlerFunc {
       }
     }
     chat_room := ""
-    id := ""
+    pre_id := ""
     i := 6
     for i < n && my_url[i] != '_' {
       chat_room += string(my_url[i])
@@ -306,9 +306,10 @@ func (clients *Clients) WSHandler(db *sql.DB) http.HandlerFunc {
     }
     i++
     for i < n {
-      id += string(my_url[i])
+      pre_id += string(my_url[i])
       i++
     }
+    id := decipherer(&pre_id, &global_aes_key)
     is_valid = GoodId(id)
     if !is_valid {
       _, err := reject_upgrader.Upgrade(w, r, nil)
