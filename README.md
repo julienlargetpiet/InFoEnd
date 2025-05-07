@@ -7,7 +7,7 @@ An end-to-end encrypted terminal chatroom application written in Go.
 ## Explanation
 
 ![Alt Text](doc1.jpg)
-![Alt Text2](doc2.jpg)
+![Alt Text2](doc2B.jpg)
 
 
 ## Setting up the server
