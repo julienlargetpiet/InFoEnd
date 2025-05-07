@@ -52,5 +52,7 @@ The client side terminal ui will appear if the informations provided are correct
 ## Requirements
 
 The clients and the server must share a `global_aes_key`
+This key is used to cipher the id the client uses, and decipher it server side.
+
 
 
