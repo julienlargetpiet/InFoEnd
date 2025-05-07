@@ -17,7 +17,6 @@ import (
   "os"
   "io"
   "time"
-  //"unicode/utf8"
 )
 
 var global_aes_key string = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
@@ -101,8 +100,6 @@ func cipherer(x *string, secret_key *string) string {
   }
 
   cipher_data := cur_gcm.Seal(cur_nonce, cur_nonce, []byte(*x), nil)
-
-  //fmt.Println("OO", cipher_data)
 
   return string(cipher_data)
 }
@@ -462,7 +459,6 @@ func main() {
   }
 
   id_val_ciphered1 := ByteCipherer(&id_val, &global_aes_key)
-  fmt.Println("0", id_val_ciphered1, len(id_val_ciphered1))
 
   id_val_ciphered := ""
   var tmp_int32 int32
@@ -472,9 +468,6 @@ func main() {
     id_val_ciphered += "-"
   }
   id_val_ciphered = id_val_ciphered[:len(id_val_ciphered) - 1]
-
-  //rec2 := ByteDecipherer(&id_val_ciphered1, &global_aes_key)
-  //fmt.Println("deciphered:", rec2)
 
   my_addr := ip_val + ":" + port_val + "/" + room_val + "_" + id_val_ciphered
   my_addr2 := ip_val + ":" + port_val + "/"
