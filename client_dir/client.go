@@ -19,6 +19,7 @@ import (
   "time"
 )
 
+var global_aes_key string = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 var max_row int = 17
 var delta_max_row int = max_row - 1
 var ref_ltr = [52]uint8{'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'}
@@ -363,7 +364,8 @@ func main() {
     return
   }
 
-  my_addr := ip_val + ":" + port_val + "/" + room_val + "_" + id_val
+  id_val_ciphered := cipherer(&id_val, &global_aes_key)
+  my_addr := ip_val + ":" + port_val + "/" + room_val + "_" + id_val_ciphered
   my_addr2 := ip_val + ":" + port_val + "/"
 
   data, err := os.ReadFile("pubKey.pem")
@@ -491,7 +493,7 @@ func main() {
   }
   cur_aes_key := string(raw_aes_key)
 
-  conn, _, err := websocket.DefaultDialer.Dial("ws://" + my_addr2 + "chat/" + room_val + "_" + id_val, nil)
+  conn, _, err := websocket.DefaultDialer.Dial("ws://" + my_addr2 + "chat/" + room_val + "_" + id_val_ciphered, nil)
   if err != nil {
     fmt.Println(err)
     return
