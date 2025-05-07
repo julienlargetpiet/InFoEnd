@@ -232,10 +232,7 @@ func HandShakeHandler(db *sql.DB) http.HandlerFunc {
       i++
     }
     pre_id2 := URLToByte(pre_id)
-    fmt.Println("pre_id:", pre_id)
-    fmt.Println("pre_id2:", pre_id2)
     id := ByteDecipherer(&pre_id2, &global_aes_key)
-    fmt.Println("id:", id)
     is_valid = GoodId(id)
     if !is_valid {
       w.Write([]byte("Wrong Id"))
