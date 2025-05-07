@@ -43,6 +43,7 @@ client_dir $ go mod tidy
 client_dir $ go build client.go
 client_dir $ echo "" > pubKey.pem
 client_dir $ echo "" > privateKey.pem
+client_dir $ mkdir my_rooms
 client_dir $ ./client id@IP:port/chat_room
 ```
 
