@@ -357,18 +357,6 @@ func Int32ToString(x *int32) string {
   return rtn_str
 }
 
-func UTF8ToURL(x string) string {
-  rtn_str := ""
-  var vl int32
-  for i := 0; i < len(x); i++ {
-    vl = int32(x[i])
-    rtn_str += Int32ToString(&vl)
-    rtn_str += "-"
-  }
-  rtn_str = rtn_str[:len(rtn_str) - 1]
-  return rtn_str
-}
-
 func main() {
 
   args := os.Args
