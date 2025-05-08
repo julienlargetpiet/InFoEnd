@@ -574,7 +574,7 @@ func main() {
     SetTextColor(tcell.ColorYellow)
 
   info_box2 := tview.NewTextView().
-    SetText("IP: | ChatRoom: ").
+    SetText("IP: " + ip_val + " | ChatRoom: " + room_val).
     SetTextColor(custom_color3)
 
   messageBox := tview.NewTextView().
