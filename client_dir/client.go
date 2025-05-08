@@ -132,29 +132,6 @@ func ByteCipherer(x *string, secret_key *string) []byte {
   return cipher_data
 }
 
-func ByteDecipherer(x *[]byte, secret_key *string) string {
-  cur_aes, err := aes.NewCipher([]byte(*secret_key))
-  if err != nil {
-    fmt.Println(err)
-    return ""
-  }
-  cur_gcm, err := cipher.NewGCM(cur_aes)
-  if err != nil {
-    fmt.Println(err)
-    return ""
-  }
-  nonce_size := cur_gcm.NonceSize()
-  cur_nonce := (*x)[:nonce_size]
-  cipher_data := (*x)[nonce_size:]
-  
-  deciphered_data, err := cur_gcm.Open(nil, []byte(cur_nonce), cipher_data, nil)
-  if err != nil {
-    fmt.Println(err)
-    return ""
-  }
-  return string(deciphered_data)
-}
-
 func GoodPort(x string) bool {
   var i2 int
   for i := 0; i < len(x); i++ {
