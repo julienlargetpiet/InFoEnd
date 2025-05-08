@@ -1,5 +1,7 @@
 # InFoEnd
 
+![Alt Text](head2.webp)
+
 ![Alt Text](demo.gif)
 
 An end-to-end encrypted terminal chatroom application written in Go. 
