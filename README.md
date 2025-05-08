@@ -1,6 +1,6 @@
 # InFoEnd
 
-![Alt Text](head2.webp)
+<img src="head2.webp" width="200" height="340">
 
 ![Alt Text](demo.gif)
 
