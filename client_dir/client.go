@@ -61,25 +61,6 @@ func StringToInt32(x string) int32 {
   return rtn_val
 }
 
-func URLToUTF8(x string) string {
-  cur_vl := ""
-  var int_vl int32
-  var rtn_rune []rune
-  for i:= 0; i < len(x); i++ {
-    if x[i] != '-' {
-      cur_vl += string(x[i])
-    } else {
-      int_vl = StringToInt32(cur_vl)
-      rtn_rune = append(rtn_rune, rune(int_vl))
-      cur_vl = ""
-    }
-  }
-  int_vl = StringToInt32(cur_vl)
-  rtn_rune = append(rtn_rune, rune(int_vl))
-  fmt.Println("end", rtn_rune)
-  return string(rtn_rune)
-}
-
 func cipherer(x *string, secret_key *string) string {
 
   cur_aes, err := aes.NewCipher([]byte(*secret_key))
